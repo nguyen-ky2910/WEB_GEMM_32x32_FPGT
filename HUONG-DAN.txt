@@ -1,0 +1,14 @@
+GEMM32 / FPGT — HƯỚNG DẪN XEM WEBSITE
+
+1) CÁCH KHUYÊN DÙNG — LINK CÔNG KHAI: gửi giám khảo link HTTPS của website (GitHub Pages). Chỉ cần bấm link và mở bằng trình duyệt hiện đại; không cần tải ZIP, cài Node/Python/KLayout hay chạy file nào. Layout 3D tải geometry GDS/DEF thật (cell, dây, via) trực tiếp từ website, chỉ tải phần của PE/module đang xem.
+
+2) GÓI OFFLINE (dự phòng khi không có Internet/hosting): giải nén TOÀN BỘ GEMM-32x32-ASIC-offline.zip rồi mở GEMM-32x32-ASIC.html (hoặc index.html) bằng Chrome/Edge. Giữ thư mục physical-data cạnh HTML. Không mở HTML ngay bên trong trình xem ZIP.
+LƯU Ý: chỉ gửi riêng file HTML là KHÔNG đủ. Thiếu thư mục physical-data thì vẫn xem được nội dung và toàn chip 3D, nhưng khi chọn PE/module sẽ không có cell, dây và via.
+
+3) TỰ DEPLOY LÊN HOSTING KHÁC: đưa toàn bộ nội dung đã giải nén (index.html, GEMM-32x32-ASIC.html, physical-data/, .nojekyll) lên một static host HTTPS bất kỳ; trang gốc tự mở website.
+
+ẢNH VÀ VIDEO (Tham khảo sản phẩm): được hiển thị trực tiếp từ nguồn chính thức nên cần Internet; nếu nguồn không tải được, ô đó hiện liên kết tới bản gốc. Video Raspberry Pi dùng player YouTube chính thức. YouTube KHÔNG cho player nhúng chạy khi HTML được mở trực tiếp bằng file:// (Error 153); khi đó trang hiện thumbnail và nút Watch on YouTube. Để xem video ngay trong trang ở bản offline: nhấp đúp MO-WEBSITE.cmd (dùng PowerShell có sẵn của Windows, mở http://localhost:8765, chỉ máy này truy cập được). Nếu SmartScreen hỏi, chọn More info → Run anyway, hoặc dùng nút Watch on YouTube.
+
+NGÔN NGỮ: mặc định tiếng Việt; chuyển English bằng công tắc ở đầu thanh bên trái, hoặc thêm ?lang=en vào link.
+
+Tên/net nội bộ macro không có trong nguồn GDS và chiều cao Z chế tạo không được suy diễn; chế độ tách lớp chỉ để trực quan hóa, không theo tỷ lệ vật lý.
