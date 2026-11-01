@@ -382,6 +382,26 @@ main{max-width:1280px;padding:44px 44px 0}
 @media(min-width:1201px){.pr-story>.pr-media,.pr-story>.pr-media-stack{position:sticky;top:28px}}
 @media(max-width:900px){.pr-block-tint{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}}
 .product-main{overflow-x:clip}
+/* Desktop layout at 100% browser zoom: use the space beside the sidebar, keep reading text at the +30% scale. */
+@media(min-width:901px){
+ main{max-width:1520px;padding:clamp(28px,2.6vw,48px) clamp(24px,3vw,56px) 0}
+ .product-main{max-width:1560px;padding:clamp(28px,2.4vw,44px) clamp(24px,3.2vw,60px) 64px}
+ .pr-heading{max-width:none;padding:0 0 clamp(18px,1.8vw,30px)}
+ .pr-heading>p{font-size:calc(18px*var(--fs));line-height:1.65;max-width:1060px}
+ .pr-jump{margin-top:20px;gap:10px}
+ .pr-block{padding:clamp(30px,2.8vw,46px) 0 clamp(34px,3vw,50px)}
+ .pr-block-heading{margin-bottom:28px}
+ .pr-block-tint{margin:8px -24px;padding:36px 24px 40px}
+ .pr-prose{max-width:980px}
+ .pr-steps{max-width:none}
+ .pr-story-copy{max-width:none}
+ .pr-bridge{max-width:1080px}
+ .pr-page .pr-note,.pr-gloss,.pr-more{max-width:1100px}
+ .pr-future>p,.pr-page .pr-close{max-width:1040px}
+}
+@media(min-width:1201px){.pr-block-tint{margin:8px calc(-1*clamp(20px,2vw,40px));padding:clamp(32px,3vw,48px) clamp(20px,2vw,40px) clamp(36px,3.2vw,52px)}}
+.pr-page h1{font-size:clamp(34px,calc(1.45vw + 28px),56px);line-height:1.12;max-width:1400px;margin:10px 0 16px;text-wrap:balance}
+.pr-heading>p{text-wrap:pretty}
 
 .share-layout{max-width:1280px;margin:auto}.share-layout h1{margin:12px 0 20px;font-size:30px}.share-note{color:var(--muted);font-size:16px;line-height:1.9;margin:16px 0}.share-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:22px 0}.share-toolbar button{border:1px solid var(--line);background:var(--control);border-radius:5px;padding:10px 15px;font-size:15px;color:var(--text)}.share-toolbar button[aria-pressed=true]{background:var(--selected);color:var(--accent);border-color:#b9cfea}.share-toolbar label{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:15px;margin-left:auto}.share-image-wrap{border:1px solid var(--line);background:#080d14;border-radius:7px;overflow:auto;max-height:72vh}.share-image-wrap img{display:block;max-width:none;height:auto;object-fit:contain;min-height:200px}.share-toolbar input{max-width:130px}@media(max-width:760px){.share-toolbar label{margin-left:0}.share-note{font-size:15px}}
 </style></head><body><a class="skip" href="#main">Bỏ qua đến nội dung</a><div id="app"><p class="loading">Đang mở bản HTML offline…</p></div><dialog id="detail-dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog><noscript>Vui lòng bật JavaScript để xem bản HTML này.</noscript><script>
