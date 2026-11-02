@@ -79028,14 +79028,18 @@ function createOfflinePhysical(physical){
   let registry=window.GEMM32_OFFLINE;
   if(!registry){registry={waiting:new Map(),models:new Map(),register(id,payload){const request=this.waiting.get(id);if(request){this.waiting.delete(id);request.resolve(payload);}}};window.GEMM32_OFFLINE=registry;}
   const m=physical.offlineManifest;if(registry.models.has(m.package))return registry.models.get(m.package);
-  const cache=new Map();let cachedBytes=0;
+  const cache=new Map(),packs=new Map();let cachedBytes=0;
+  // Web edition only: many tiny standard-cell chunks are served together in one pack file (the same payload
+  // strings as the individual chunk files, verified at export), so a first PE view needs ~12 requests, not ~150.
+  const loadPack=i=>{if(!packs.has(i))packs.set(i,new Promise((resolve,reject)=>{const id=m.package+':pack:'+i,script=document.createElement('script');const fail=()=>{registry.waiting.delete(id);script.remove();packs.delete(i);const error=Error('OFFLINE_ASSET_MISSING: '+m.packs[i]+'. Check the connection and reload.');error.code='OFFLINE_ASSET_MISSING';reject(error);};registry.waiting.set(id,{resolve,reject});script.src=new URL(m.packs[i],document.baseURI).href;script.async=true;script.onerror=fail;script.onload=()=>{if(registry.waiting.has(id))fail();else script.remove();};document.head.append(script);}));return packs.get(i);};
   const load=key=>{
     if(cache.has(key)){const entry=cache.get(key);cache.delete(key);cache.set(key,entry);return entry.promise;}
     if(!m.assets[key])return Promise.reject(Error('OFFLINE_ASSET_NOT_INDEXED: '+key));
     const entry={size:0,promise:null};
     entry.promise=(async()=>{
       if(typeof DecompressionStream!=='function')throw Error('OFFLINE_BROWSER_UNSUPPORTED: use a current Chrome or Edge browser.');
-      const data=await new Promise((resolve,reject)=>{const id=m.package+':'+key,script=document.createElement('script');const fail=()=>{registry.waiting.delete(id);script.remove();cache.delete(key);const error=Error('OFFLINE_ASSET_MISSING: '+m.folder+'/'+key+'.js. Extract GEMM-32x32-ASIC-offline.zip and keep physical-data beside the HTML.');error.code='OFFLINE_ASSET_MISSING';reject(error);};registry.waiting.set(id,{resolve,reject});script.src=new URL(m.folder+'/'+key+'.js',document.baseURI).href;script.async=true;script.onerror=fail;script.onload=()=>{if(registry.waiting.has(id))fail();else script.remove();};document.head.append(script);});
+      const packed=m.packOf?.[key];
+      const data=packed!==undefined?await loadPack(packed).then(pack=>{if(typeof pack[key]!=='string')throw Error('OFFLINE_ASSET_MISSING: '+key+' not in '+m.packs[packed]);return pack[key];}):await new Promise((resolve,reject)=>{const id=m.package+':'+key,script=document.createElement('script');const fail=()=>{registry.waiting.delete(id);script.remove();cache.delete(key);const error=Error('OFFLINE_ASSET_MISSING: '+m.folder+'/'+key+'.js. Extract GEMM-32x32-ASIC-offline.zip and keep physical-data beside the HTML.');error.code='OFFLINE_ASSET_MISSING';reject(error);};registry.waiting.set(id,{resolve,reject});script.src=new URL(m.folder+'/'+key+'.js',document.baseURI).href;script.async=true;script.onerror=fail;script.onload=()=>{if(registry.waiting.has(id))fail();else script.remove();};document.head.append(script);});
       const bytes=Uint8Array.from(atob(data),c=>c.charCodeAt(0));const buffer=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
       entry.size=buffer.byteLength;cachedBytes+=entry.size;const value=key.startsWith('g_')||key.startsWith('r_')?new Int32Array(buffer):JSON.parse(new TextDecoder().decode(buffer));
       while(cachedBytes>64*1048576&&cache.size>1){const first=cache.keys().next().value;if(first===key)break;const old=cache.get(first);cache.delete(first);cachedBytes-=old.size;}
