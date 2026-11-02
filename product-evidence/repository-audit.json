@@ -1,0 +1,59 @@
+{
+  "checked": "2026-10-28",
+  "repository": "https://github.com/VinhPT-Lab/GEMM_32x32_KV260",
+  "commit": "ea7323111b4340b04748195b7836fdfb0af1056c",
+  "tree": "d9bac7d391fe8809f6d15b5fc5acec7f532f0496",
+  "commitDate": "2026-07-23T05:26:42Z",
+  "revisionEquivalence": "Not established against the supplied ASIC final_a5 netlist.",
+  "files": [
+    {
+      "path": "docs/README.md",
+      "url": "https://github.com/VinhPT-Lab/GEMM_32x32_KV260/blob/ea7323111b4340b04748195b7836fdfb0af1056c/docs/README.md",
+      "content": "# Shape-Aware INT8 GEMM Accelerator on Kria KV260\n\nThis repository implements a 32 x 32 weight-stationary INT8 GEMM accelerator for the Xilinx Kria KV260. The design combines a 1,024-processing-element systolic array with AXI4-Lite control, three AXI DMA engines, 256-bit AXI4-Stream data paths, and a Linux integration path for selective `llama.cpp` offload.\n\n## Highlights\n\n- 32 x 32 weight-stationary systolic array (1,024 processing elements)\n- Signed INT8 feature and weight inputs\n- 32-bit inter-tile accumulation followed by right shift and INT8 saturation\n- Two 256-bit AXI4-Stream inputs and one 256-bit AXI4-Stream output\n- AXI4-Lite configuration and status interface\n- Three-DMA architecture: feature MM2S, weight MM2S, and result S2MM\n- Bare-metal 32 x 32 hardware verification with `COMPARE PASS`\n- Linux coherent-DMA driver and shape-aware `llama.cpp` integration\n- CPU fallback for unsupported or low-efficiency GEMM shapes\n\n## System Architecture\n\n![KV260 GEMM system architecture](d",
+      "originalCharacters": 3625,
+      "retrievedTextSha256": "70b6f798ceadfa22dcbe1cf25fd123bc28f4e345bbe4ef4b65427f2f9e9917a4",
+      "excerpt": true
+    },
+    {
+      "path": "docs/architecture.md",
+      "url": "https://github.com/VinhPT-Lab/GEMM_32x32_KV260/blob/ea7323111b4340b04748195b7836fdfb0af1056c/docs/architecture.md",
+      "content": "# Hardware Architecture\n\n## 1. Overview\n\nThe accelerator is a 32 x 32 weight-stationary INT8 GEMM engine for the Xilinx Kria KV260. It receives packed feature and weight vectors over independent AXI4-Stream inputs, performs tiled matrix multiplication in a 1,024-PE systolic array, accumulates partial results across K blocks, applies output quantization, and returns packed INT8 result vectors over AXI4-Stream.\n\nThe design is separated into two architectural levels:\n\n1. The KV260 system level: Processing System, DDR, AXI DMA engines, control bus, and streaming data paths.\n2. The accelerator level: stream adapters, configuration/status logic, input buffering, tile scheduling, systolic computation, accumulation, and output quantization.\n\n## 2. KV260 System Architecture\n\n![KV260 GEMM system architecture](images/system-architecture.png)\n\nThe system contains one GEMM accelerator and three AXI DMA instances.\n\n| Component | Role |\n|---|---|\n| Processing System | Configures GEMM and DMA register",
+      "originalCharacters": 9617,
+      "retrievedTextSha256": "5928815792a007c7159b48bb8b1b450f57a12b0620e3c28b2b04fe0837df9182",
+      "excerpt": true
+    },
+    {
+      "path": "docs/baremetal-bringup.md",
+      "url": "https://github.com/VinhPT-Lab/GEMM_32x32_KV260/blob/ea7323111b4340b04748195b7836fdfb0af1056c/docs/baremetal-bringup.md",
+      "content": "# Bare-Metal Bring-Up on Kria KV260\n\n## 1. Purpose\n\nThis guide documents the verified Vivado/Vitis 2022.2 procedure for running the 32 x 32 signed INT8 GEMM comparison test on the Kria KV260. It focuses on stable board initialization, AXI4-Lite reachability, DMA ordering, cache maintenance, expected output, and troubleshooting.\n\nFor address, register, and stream-layout details, see the [Software Programming Model](programming-model.md).\n\n## 2. Verified Baseline\n\n| Item | Configuration |\n|---|---|\n| Board | Xilinx Kria KV260 / K26 |\n| Processor | Cortex-A53 #0 |\n| Software environment | Vitis standalone / bare-metal |\n| Tools | Vivado and Vitis 2022.2 |\n| Matrix test | 32 x 32 x 32 signed INT8 GEMM |\n| AXI4-Stream width | 256 bits |\n| Matrix bytes | 1,024 bytes for A, B, and C |\n| UART | 115200 baud |\n\nVerified completion:\n\n```text\nDMA0 feature done, status=0x00001002\nDMA1 weight done, status=0x00001002\nDMA2 result done, status=0x00001002\nGEMM done, status=0x06000000\nCOMPARE PASS\n```\n\n#",
+      "originalCharacters": 7739,
+      "retrievedTextSha256": "39260a757c70b16288d575c80a8701218e6834f780be8c1b63366791954d5785",
+      "excerpt": true
+    },
+    {
+      "path": "docs/linux-llama-integration.md",
+      "url": "https://github.com/VinhPT-Lab/GEMM_32x32_KV260/blob/ea7323111b4340b04748195b7836fdfb0af1056c/docs/linux-llama-integration.md",
+      "content": "# Linux and llama.cpp Integration\n\n## 1. Purpose\n\nThis guide documents the current Linux execution path for the KV260 GEMM accelerator and its selective integration into `llama.cpp`. The implemented flow uses an FPGA overlay, a custom coherent DMA-buffer kernel module, AXI4-Lite/DMA control from the runtime, and a shape-aware hook in `ggml_compute_forward_mul_mat`.\n\nThis is not a generic list of possible Linux DMA methods. It describes the current project implementation.\n\n## 2. Current Platform\n\n| Item | Current environment |\n|---|---|\n| Board | Xilinx Kria KV260 |\n| OS | Ubuntu 22.04.4 LTS |\n| Kernel | `5.15.0-1027-xilinx-zynqmp` |\n| CPU | 4 x Cortex-A53 at 1.333 GHz |\n| PL clock | 100 MHz |\n| Model used for evaluation | Qwen2.5-0.5B-Instruct-Q4_K_M |\n| Runtime | Modified `llama.cpp` / GGML |\n\n## 3. Linux Startup Sequence\n\n1. Boot the KV260 Linux image.\n2. Load the GEMM FPGA application/overlay.\n3. Confirm the FPGA manager is operating.\n4. Load the coherent DMA-buffer kernel module.\n5",
+      "originalCharacters": 9265,
+      "retrievedTextSha256": "5d3a867897f7949f2a6b5dded113be8268a74c65ee68cbac36e70199ad4102fa",
+      "excerpt": true
+    },
+    {
+      "path": "rtl/GEMM_top.v",
+      "url": "https://github.com/VinhPT-Lab/GEMM_32x32_KV260/blob/ea7323111b4340b04748195b7836fdfb0af1056c/rtl/GEMM_top.v",
+      "content": "`timescale 1ns / 1ps\n\nmodule GEMM_top\n#(\n    parameter integer P_AXI_LITE_DATA_WIDTH = 32,\n    parameter integer P_AXI_LITE_ADDR_WIDTH = 4,\n    parameter integer P_ARRAY_SIZE = 32,\n    parameter integer P_DATA_WIDTH = 8,\n    parameter integer P_SHIFT_WIDTH = 10,\n    parameter integer P_WEIGHT_BUFFER_DEPTH = 2400,\n    parameter integer P_FEATURE_BUFFER_DEPTH = 2400,\n    parameter integer P_OUTPUT_BUFFER_DEPTH = 2400,\n    parameter integer P_ACCUM_WIDTH = 32,\n    parameter integer P_ROW_COUNT_WIDTH = 9,\n    parameter integer P_K_BLOCK_COUNT_WIDTH = 5,\n    parameter integer P_N_BLOCK_COUNT_WIDTH = 5\n)\n(\n    //----------------------------------\n    // AXI-Lite Control\n    //----------------------------------\n    input wire  S_AXI_ACLK,\n    input wire  S_AXI_ARESETN,\n\n    input wire [P_AXI_LITE_ADDR_WIDTH-1:0] S_AXI_AWADDR,\n    input wire [2:0] S_AXI_AWPROT,\n    input wire S_AXI_AWVALID,\n    output wire S_AXI_AWREADY,\n\n    input wire [P_AXI_LITE_DATA_WIDTH-1:0] S_AXI_WDATA,\n    input wire [(P_AXI_LITE_DATA_WIDTH/8)-1:0] S_AXI_WSTRB,\n    input wire S_AXI_WVALID,\n    output wire S_AXI_WREADY,\n\n    output wire [1:0] S_AXI_BRESP,\n    output wire S_AXI_BVALID,\n    input wire S_AXI_BREADY,\n\n    input wire [P_AXI_LITE_ADDR_WIDTH-1:0] S_AXI_ARADDR,\n    input wire [2:0] S_AXI_ARPROT,\n    input wire S_AXI_ARVALID,\n    output wire S_AXI_ARREADY,\n\n    output wire [P_AXI_LITE_DATA_WIDTH-1:0] S_AXI_RDATA,\n    output wire [1:0] S_AXI_RRESP,\n    output wire S_AXI_RVALID,\n    input wire S_AXI_RREADY,\n\n    //----------------------------------\n    // Feature AXIS Slave\n    //----------------------",
+      "originalCharacters": 9856,
+      "retrievedTextSha256": "2319a115caa5cedb506bb4e58925a5be1a51b7723ca77660e9151199a5c61fb1",
+      "excerpt": true
+    },
+    {
+      "path": "rtl/PE.v",
+      "url": "https://github.com/VinhPT-Lab/GEMM_32x32_KV260/blob/ea7323111b4340b04748195b7836fdfb0af1056c/rtl/PE.v",
+      "content": "`timescale 1ns / 1ps\n\nmodule ProcessingElement\n#(\n    parameter P_DATA_WIDTH = 8,           \n    parameter P_ARRAY_ROWS = 32,             \n    parameter P_ARRAY_COLS = 32,              \n    parameter P_ROW_INDEX_WIDTH = 5\n)\n(\n    input                                                   i_clk,\n    input                                                   i_weight_load,      \n    input                                                   i_rst_n,      \n    input signed [P_DATA_WIDTH-1:0]                           i_feature_value,\n    input signed [P_DATA_WIDTH-1:0]                           i_weight_value,\n    input signed [2*P_DATA_WIDTH+P_ROW_INDEX_WIDTH-1:0]            i_partial_sum,   \n    output reg signed [P_DATA_WIDTH-1:0]                      o_feature_value,\n    output reg signed [2*P_DATA_WIDTH+P_ROW_INDEX_WIDTH-1:0]       o_partial_sum    \n);\nlocalparam integer LP_PSUM_WIDTH       = 2*P_DATA_WIDTH + P_ROW_INDEX_WIDTH;\nlocalparam integer LP_MULT_LATENCY     = 1;\nlocalparam integer LP_PE_TOTAL_LATENCY = LP_MULT_LATENCY + 1;\n\nreg signed [P_DATA_WIDTH-1:0] r_weight_value;\nreg signed [LP_PSUM_WIDTH-1:0] r_partial_sum_d1;\nwire signed [15:0] w_product_raw;\nwire signed [LP_PSUM_WIDTH-1:0] w_product_ext;\n\nmult_IP u_mult_IP (\n    .CLK(i_clk),\n    .A(i_feature_value),\n    .B(r_weight_value),\n    .P(w_product_raw)\n);\n\nassign w_product_ext = {{(LP_PSUM_WIDTH-16){w_product_raw[15]}}, w_product_raw};\n\nalways @(posedge i_clk or negedge i_rst_n) begin\n    if(~i_rst_n)begin\n        o_partial_sum <= 0;\n        r_weight_value <= 0;\n        o_feature_value <= 0;\n        r_partial_sum_d1 <= 0",
+      "originalCharacters": 1865,
+      "retrievedTextSha256": "0c8e2fa265343fe6a96a0808874d7c37245f13f4b68db579babf2fa82bd9ea39",
+      "excerpt": true
+    }
+  ],
+  "snapshotScope": "Bounded excerpts of retrieved repository text; use pinned URLs for full files."
+}

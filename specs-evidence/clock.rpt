@@ -1,0 +1,14 @@
+Clock S_AXI_ACLK
+Latency      CRPR       Skew
+u_axi_shell/S_AXI_ACLK ^
+   5.95
+_55755_/CLK ^
+   4.09     -0.18       1.68
+
+Clock S_AXI_ACLK
+Latency      CRPR       Skew
+_56744_/CLK ^
+   4.78
+_57895_/CLK ^
+   6.47     -0.42      -2.11
+

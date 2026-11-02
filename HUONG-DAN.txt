@@ -9,6 +9,6 @@ LƯU Ý: chỉ gửi riêng file HTML là KHÔNG đủ. Thiếu thư mục physi
 
 ẢNH VÀ VIDEO (Tham khảo sản phẩm): được hiển thị trực tiếp từ nguồn chính thức nên cần Internet; nếu nguồn không tải được, ô đó hiện liên kết tới bản gốc. Video Raspberry Pi dùng player YouTube chính thức. YouTube KHÔNG cho player nhúng chạy khi HTML được mở trực tiếp bằng file:// (Error 153); khi đó trang hiện thumbnail và nút Watch on YouTube. Để xem video ngay trong trang ở bản offline: nhấp đúp MO-WEBSITE.cmd (dùng PowerShell có sẵn của Windows, mở http://localhost:8765, chỉ máy này truy cập được). Nếu SmartScreen hỏi, chọn More info → Run anyway, hoặc dùng nút Watch on YouTube.
 
-NGÔN NGỮ: mặc định tiếng Việt; chuyển English bằng công tắc ở đầu thanh bên trái, hoặc thêm ?lang=en vào link.
+NGÔN NGỮ: mặc định tiếng Anh (English) cho người xem lần đầu; chọn Tiếng Việt bằng công tắc ở đầu thanh bên trái (lựa chọn được ghi nhớ), hoặc thêm ?lang=vi vào link.
 
 Tên/net nội bộ macro không có trong nguồn GDS và chiều cao Z chế tạo không được suy diễn; chế độ tách lớp chỉ để trực quan hóa, không theo tỷ lệ vật lý.

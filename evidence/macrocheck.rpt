@@ -1,0 +1,11 @@
+magic_macro_check: Magic DRC markers next to macros, rechecked on the full layout (GDS)
+
+markers per rule (drc.rpt):
+
+markers within 2 um of a macro: 0 (by rule: )
+  still an error on the full layout: 0
+  not checked (no window / Magic did not finish the window): 0
+markers NOT next to a macro (not waived): 0
+markers of routing over a macro (Can't overlap those layers, or deeper than 5 um inside; not waived): 0
+
+RESULT: PASS - every non-skipped marker is a macro-abstract artefact
